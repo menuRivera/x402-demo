@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { ethers } from "ethers";
 
-// default 402 payment required payload
+// default 402 payment required payload "exact"
 // {
 //   "accepts": [
 //     {
@@ -24,8 +23,13 @@ import { ethers } from "ethers";
 //   "payer": "0xBuyerAddress...",
 //   "transaction": "0xTransactionHash..."
 // }
+// note: maybe include here all information related with the payed asset
+interface IEvvmPaymentSignature {
+  payer: `0x${string}`;
+  signature: `0x${string}`; // SignedAction<IPayData>
+}
 // IA prop
-type EvvmPaymentRequired = {
+interface IEvvmPaymentRequired {
   // === Standard x402 fields ===
   scheme: "evvm"; // Custom scheme identifier
   network: string; // CAIP-2 format, e.g. "eip155:8453"
@@ -36,11 +40,10 @@ type EvvmPaymentRequired = {
   resource: string; // Resource URL
   description?: string; // Human-readable description
   mimeType?: string; // Response MIME type
-
   // === EVVM-specific fields ===
   contractAddress: `0x${string}`; // EVVM contract address
   evvmId?: string; // Optional EVVM identifier
-};
+}
 // {
 //   "accepts": [
 //     {
@@ -52,7 +55,7 @@ type EvvmPaymentRequired = {
 //       "maxTimeoutSeconds": 60,
 //       "resource": "https://api.example.com/data",
 //       "contractAddress": "0xYourEvvmContract...",
-//       "evvmId": "optional-evvm-id"
+//       "evvmId": 777
 //     }
 //   ],
 //   "x402Version": 2
@@ -65,8 +68,32 @@ export const paymentRequired = async (
 ) => {
   const payment = req.get("PAYMENT-SIGNATURE");
   if (!payment) {
+    // send accept header with evvm scheme
+    const paymentPayload: IEvvmPaymentRequired = {
+      scheme: "evvm",
+      network: "eip155:8453", // replace with ethereum sepolia
+      evvmId: "777",
+      contractAddress: "0x0000000000000000000000000000000000000000",
+      maxAmountRequired: "200",
+      asset: "0x0000000000000000000000000000000000000000", // mate token
+      payTo: "0xa2477E16dCB42E2AD80f03FE97D7F1a1646cd1c0",
+      maxTimeoutSeconds: 60,
+      resource: "https://api.example.com/data",
+    };
+    res.set("PAYMENT-REQUIRED", JSON.stringify(paymentPayload));
     // return 402 payment required
-    req.statusCode = 402;
+    return res.status(402).send("payment required");
   }
+  try {
+    const paymentSignature = JSON.parse(payment);
+	if(paymentSignature) return next()
+  } catch (error) {
+	  console.error(error)
+  }
+
+  // else, payment provided, verify payment
+  // execute it
+
+  // if success, run next()
   next();
 };
