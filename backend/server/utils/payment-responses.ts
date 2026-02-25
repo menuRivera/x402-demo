@@ -1,17 +1,19 @@
-import { config } from "config";
-import { IExactEvvmSchema } from "types/evvm-schema.types";
+import { HexString } from "@evvm/evvm-js";
+import { IExactEvvmSchema } from "server/types";
 
 const mateToken = "0x0000000000000000000000000000000000000001";
 
+const config = useRuntimeConfig();
+
 const defaultOffer: IExactEvvmSchema = {
   scheme: "evvm",
-  network: `eip155:1`,
+  network: `eip155:11155111`, // sepolia
   amount: "10000",
   asset: mateToken,
   payTo: config.receiver,
   maxTimeoutSeconds: 30,
   extra: {
-    coreContractAddress: config.evvmCoreAddress,
+    coreContractAddress: config.evvmCoreAddress as HexString,
   },
 };
 

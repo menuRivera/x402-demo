@@ -13,6 +13,6 @@
   "dependencies": {
     "@evvm/evvm-js": "^0.1.20",
     "@x402/core": "^2.4.0",
-    "viem": "^2.46.3"
+    "viem": "2.45.0"
   }
 }

@@ -3,12 +3,6 @@
 // PAYMENT-SIGNATURE
 // PAYMENT-RESPONSE
 
-import { settlePayment, verifyPayment } from "util/facilitator";
-import {
-  invalidPaymentResponse,
-  paymentRequiredResponse,
-} from "util/payment-responses";
-
 export default defineEventHandler(async (event) => {
   // include only /protected route
   const url = event.node.req.url;

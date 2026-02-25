@@ -1,9 +1,11 @@
-import { createSignerWithViem, execute } from "@evvm/evvm-js";
-import { config } from "config";
-import { IPaymentPayload, isPaymentPayload } from "types/payment-payload.types";
+import { createSignerWithViem, execute, HexString } from "@evvm/evvm-js";
 import { createWalletClient, http } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
+import {
+  IPaymentPayload,
+  isPaymentPayload,
+} from "../types/payment-payload.types";
 
 /**
  * Verifies the payment can be executed (check balances, signatures, etc)
@@ -38,7 +40,8 @@ export const verifyPayment = async (
 export const settlePayment = async (
   payload: IPaymentPayload,
 ): Promise<string | null> => {
-  const account = privateKeyToAccount(config.executorPrivateKey);
+  const config = useRuntimeConfig();
+  const account = privateKeyToAccount(config.executorPrivateKey as HexString);
   const client = createWalletClient({
     account,
     chain: sepolia,
