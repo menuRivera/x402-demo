@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+@theme {
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+
+body {
+  font-family: var(--font-mono);
+  background: linear-gradient(180deg, #064e3b 0%, #065f46 30%, #111827 80%);
+  min-height: 100vh;
+  color: #e5e7eb;
+}
+
+.rainbow-button {
+  font-family: var(--font-mono) !important;
+  font-size: 12px !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+  background: rgba(6, 78, 59, 0.6) !important;
+  border: 1px solid #34d399 !important;
+  color: #6ee7b7 !important;
+  padding: 8px 16px !important;
+  border-radius: 4px !important;
+  transition: all 0.2s ease !important;
+}
+
+.rainbow-button:hover {
+  border-color: #10b981 !important;
+  background: rgba(6, 78, 59, 0.8) !important;
+  color: #a7f3d0 !important;
+}

@@ -18,8 +18,7 @@ export const verifyPayment = async (
   // assert it has the correct schema
   let payload = null;
   try {
-    const asJson = JSON.parse(decodedString) as IPaymentPayload;
-    payload = asJson;
+    payload = JSON.parse(decodedString) as IPaymentPayload;
   } catch (error) {
     console.error("Failed to parse payment payload");
     return null;
@@ -28,7 +27,7 @@ export const verifyPayment = async (
   if (!isPaymentPayload(payload)) return null;
 
   const isValidSignature = await verifySignature(payload.payload);
-  if(!isValidSignature) return null
+  if (!isValidSignature) return null;
   return payload;
 };
 
