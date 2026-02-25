@@ -27,7 +27,8 @@ export function useEVVM() {
           chainId: walletClient.chain.id,
         });
         setCore(evvmCore);
-      } catch {
+      } catch (err) {
+        console.error("Failed to initialize EVVM Core:", err);
         setCore(null);
         setSigner(null);
       }

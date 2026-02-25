@@ -1,96 +1,158 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useEVVM } from "./useEVVM";
 import type { IPaymentRequiredPayload } from "../types/payment-required-payload.types";
 import type { HexString } from "@evvm/evvm-js";
 import type { IPaymentPayload } from "../types/payment-payload.types";
 
-type Status = "ready" | "payment-required" | "signature-ready" | "success";
+export type Status =
+  | "idle"
+  | "fetching"
+  | "payment-required"
+  | "signing"
+  | "success"
+  | "error";
 
-export const useX402 = (url: string) => {
+export interface PaymentDetails {
+  amount: string;
+  token: string;
+  recipient: string;
+}
+
+export const useX402 = () => {
   const { core, signer } = useEVVM();
-  // base64 encoded signature payload
   const [signature, setSignature] = useState<string | null>(null);
   const [paymentRequiredPayload, setPaymentRequiredPayload] =
     useState<IPaymentRequiredPayload | null>(null);
-  const [status, setStatus] = useState<Status>("ready");
-  const [content, setContent] = useState<any>();
+  const [status, setStatus] = useState<Status>("idle");
+  const [content, setContent] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [paymentDetails, setPaymentDetails] = useState<PaymentDetails | null>(
+    null,
+  );
+  const [currentUrl, setCurrentUrl] = useState<string>("");
 
-  useEffect(() => {
-    if (!paymentRequiredPayload) fetchProtectedAsset();
-  }, [signature]);
+  const fetchProtectedAsset = useCallback(async (url: string) => {
+    setCurrentUrl(url);
+    setStatus("fetching");
+    setError(null);
+    setContent(null);
+    setPaymentDetails(null);
+    setSignature(null);
+    setPaymentRequiredPayload(null);
 
-  useEffect(() => {
-    if (paymentRequiredPayload) signPayment();
-  }, [paymentRequiredPayload, core, signer]);
+    const raw = await fetch(url);
 
-  const fetchProtectedAsset = async () => {
-    const headers = new Headers();
-    if (signature) {
-      headers.set("PAYMENT-SIGNATURE", signature);
-    }
-
-    const raw = await fetch(url, {
-      headers,
-    });
-
-    if (raw.status == 402) {
+    if (raw.status === 402) {
       setStatus("payment-required");
       const paymentRequiredHeader = raw.headers.get("PAYMENT-REQUIRED");
-      if (!paymentRequiredHeader) throw new Error("No PAYMENT-REQUIRED header");
+      if (!paymentRequiredHeader) {
+        setError("No PAYMENT-REQUIRED header");
+        setStatus("error");
+        return;
+      }
 
-      const paymentRequiredDecoded = Buffer.from(
-        paymentRequiredHeader,
-      ).toString("utf-8");
+      const paymentRequiredDecoded = atob(paymentRequiredHeader);
 
       try {
         const _paymentPayload = JSON.parse(
           paymentRequiredDecoded,
         ) as IPaymentRequiredPayload;
         setPaymentRequiredPayload(_paymentPayload);
-      } catch (error) {
-        console.error(error);
+
+        const required = _paymentPayload.offers[0];
+        setPaymentDetails({
+          amount: (Number(required.amount) / 1e6).toFixed(2),
+          token: "USDC",
+          recipient: `${required.payTo.slice(0, 6)}...${required.payTo.slice(-4)}`,
+        });
+      } catch (err) {
+        setError("Failed to parse payment required response");
+        setStatus("error");
       }
-    } else if (raw.status == 200) {
+    } else if (raw.status === 200) {
       const res = await raw.json();
       setStatus("success");
       setContent(res);
+    } else {
+      setError(`Unexpected status: ${raw.status}`);
+      setStatus("error");
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (signature && currentUrl) {
+      const submitPayment = async () => {
+        setStatus("fetching");
+        const headers = new Headers();
+        headers.set("PAYMENT-SIGNATURE", signature);
+
+        const raw = await fetch(currentUrl, { headers });
+
+        if (raw.status === 200) {
+          const res = await raw.json();
+          setStatus("success");
+          setContent(res);
+        } else {
+          setError(`Payment failed: ${raw.status}`);
+          setStatus("error");
+        }
+      };
+      submitPayment();
+    }
+  }, [signature, currentUrl]);
+
+  useEffect(() => {
+    if (paymentRequiredPayload && core && signer) {
+      signPayment();
+    }
+  }, [paymentRequiredPayload, core, signer]);
 
   const signPayment = async () => {
-    if (!paymentRequiredPayload || !core || !signer) return;
+    if (!paymentRequiredPayload || !core || !signer) {
+      if (paymentRequiredPayload && !core) {
+        setError("EVVM not initialized. Check VITE_EVVM_CONTRACT_ADDRESS");
+        setStatus("error");
+      }
+      return;
+    }
 
-    const required = paymentRequiredPayload.offers[0];
+    setStatus("signing");
 
-    const nonce = await core.getSyncNonce();
+    try {
+      const required = paymentRequiredPayload.offers[0];
+      const nonce = await core.getSyncNonce();
 
-    const paySignedAction = await core.pay({
-      toAddress: required.payTo as HexString,
-      amount: BigInt(required.amount),
-      tokenAddress: required.asset,
-      nonce,
-      priorityFee: 0n,
-      senderExecutor: required.extra.executor,
-      isAsyncExec: false,
-    });
+      const paySignedAction = await core.pay({
+        toAddress: required.payTo as HexString,
+        amount: BigInt(required.amount),
+        tokenAddress: required.asset,
+        nonce,
+        priorityFee: 0n,
+        senderExecutor: required.extra.executor,
+        isAsyncExec: false,
+      });
 
-    const paymentPayload: IPaymentPayload = {
-      x402Version: 2,
-      accepted: required,
-      payload: paySignedAction.toJSON(),
-    };
+      const paymentPayload: IPaymentPayload = {
+        x402Version: 2,
+        accepted: required,
+        payload: paySignedAction.toJSON(),
+      };
 
-    const encoded = Buffer.from(JSON.stringify(paymentPayload)).toString(
-      "base64",
-    );
+      const encoded = btoa(JSON.stringify(paymentPayload));
 
-    setPaymentRequiredPayload(null);
-    setSignature(encoded);
-    setStatus("signature-ready");
+      setPaymentRequiredPayload(null);
+      setSignature(encoded);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Payment signing failed");
+      setStatus("error");
+    }
   };
 
   return {
     status,
     content,
+    error,
+    paymentDetails,
+    fetchProtectedAsset,
   };
 };

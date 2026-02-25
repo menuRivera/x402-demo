@@ -21,4 +21,15 @@ export default defineNitroConfig({
     evvmCoreAddress: process.env.EVVM_CORE_ADDRESS!,
     executorPrivateKey: process.env.EXECUTOR_PRIVATE_KEY!,
   },
+  routeRules: {
+    "*": {
+      cors: true,
+      headers: {
+        "access-control-allow-credentials": "true",
+        "access-control-allow-origin": "*",
+        "access-control-allow-methods": "*",
+        "access-control-allow-headers": "*",
+      },
+    },
+  },
 });

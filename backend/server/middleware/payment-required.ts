@@ -11,6 +11,9 @@ export default defineEventHandler(async (event) => {
 
   if (!protectedRoute) return;
 
+  const method = event.method;
+  if (method === "OPTIONS") return;
+
   // verify it has a valid payment attached
   const paymentSignature = event.headers.get("PAYMENT-SIGNATURE");
   if (!paymentSignature) return paymentRequiredResponse();
