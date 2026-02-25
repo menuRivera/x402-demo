@@ -1,7 +1,4 @@
-import { createSignerWithViem, execute, HexString } from "@evvm/evvm-js";
-import { createWalletClient, http } from "viem";
-import { privateKeyToAccount } from "viem/accounts";
-import { sepolia } from "viem/chains";
+import { execute } from "@evvm/evvm-js";
 import {
   IPaymentPayload,
   isPaymentPayload,
@@ -30,7 +27,8 @@ export const verifyPayment = async (
 
   if (!isPaymentPayload(payload)) return null;
 
-  // todo: verify actual signature validity
+  const isValidSignature = await verifySignature(payload.payload);
+  if(!isValidSignature) return null
   return payload;
 };
 
@@ -40,15 +38,8 @@ export const verifyPayment = async (
 export const settlePayment = async (
   payload: IPaymentPayload,
 ): Promise<string | null> => {
-  const config = useRuntimeConfig();
-  const account = privateKeyToAccount(config.executorPrivateKey as HexString);
-  const client = createWalletClient({
-    account,
-    chain: sepolia,
-    transport: http(),
-  });
   try {
-    const signer = await createSignerWithViem(client);
+    const signer = await useSigner();
     const txHash = await execute(signer, payload.payload);
     return txHash;
   } catch (error) {
