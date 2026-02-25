@@ -33,6 +33,8 @@ export const paymentRequiredResponse = (): Response => {
   headers.set("Access-Control-Expose-Headers", "PAYMENT-REQUIRED"); // Vital for CORS
   headers.set("Content-Type", "application/json");
 
+  console.log("Payment required");
+
   return new Response("Payment Required", { headers, status: 402 });
 };
 
@@ -40,5 +42,6 @@ export const paymentRequiredResponse = (): Response => {
  * Returned when an invalid response is received
  */
 export const invalidPaymentResponse = (reason: string): Response => {
+  console.log("Payment invalid");
   return new Response(`Payment Invalid: ${reason}`, { status: 400 });
 };

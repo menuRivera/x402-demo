@@ -23,7 +23,7 @@ export const verifySignature = async (
   const evvmId = await core.getEvvmID();
   const hashPayload = core.buildHashPayload(signedAction.functionName, {
     to_address: signedAction.data.to_address,
-    to_identity: signedAction.data.to_address,
+    to_identity: signedAction.data.to_identity,
     token: signedAction.data.token,
     amount: signedAction.data.amount,
     priorityFee: signedAction.data.priorityFee,

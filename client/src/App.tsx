@@ -1,35 +1,12 @@
-import { useAccount, useConnect, useDisconnect } from "wagmi";
-import { injected } from "wagmi/connectors";
 import { useX402 } from "./hooks/useX402";
 import { PaymentStepper } from "./components/PaymentStepper";
 import { PaymentDetails } from "./components/PaymentDetails";
 import { JsonViewer } from "./components/JsonViewer";
-
-function CustomConnectButton() {
-  const { address, isConnected } = useAccount();
-  const { connect } = useConnect();
-  const { disconnect } = useDisconnect();
-
-  if (isConnected && address) {
-    return (
-      <button onClick={() => disconnect()} className="rainbow-button">
-        {address.slice(0, 6)}...{address.slice(-4)}
-      </button>
-    );
-  }
-
-  return (
-    <button
-      onClick={() => connect({ connector: injected() })}
-      className="rainbow-button"
-    >
-      Connect
-    </button>
-  );
-}
+import { CustomConnectButton } from "./components/CusomConnectButton";
 
 function App() {
-  const { status, content, error, paymentDetails, fetchProtectedAsset } = useX402();
+  const { status, content, error, paymentDetails, fetchProtectedAsset } =
+    useX402();
 
   const handleFetch = () => {
     fetchProtectedAsset("http://localhost:3000/protected");
@@ -56,12 +33,11 @@ function App() {
             : "Fetching..."}
         </button>
 
+		{/* maybe delete this? */}
         <PaymentStepper status={status} />
 
         {error && (
-          <div className="text-red-400 font-mono text-sm mt-4">
-            {error}
-          </div>
+          <div className="text-red-400 font-mono text-sm mt-4">{error}</div>
         )}
 
         {paymentDetails && status === "payment-required" && (

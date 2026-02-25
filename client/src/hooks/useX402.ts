@@ -31,6 +31,34 @@ export const useX402 = () => {
   );
   const [currentUrl, setCurrentUrl] = useState<string>("");
 
+  useEffect(() => {
+    if (signature && currentUrl) {
+      const submitPayment = async () => {
+        setStatus("fetching");
+        const headers = new Headers();
+        headers.set("PAYMENT-SIGNATURE", signature);
+
+        const raw = await fetch(currentUrl, { headers });
+
+        if (raw.status === 200) {
+          const res = await raw.json();
+          setStatus("success");
+          setContent(res);
+        } else {
+          setError(`Payment failed: ${raw.status}`);
+          setStatus("error");
+        }
+      };
+      submitPayment();
+    }
+  }, [signature, currentUrl]);
+
+  useEffect(() => {
+    if (paymentRequiredPayload && core && signer) {
+      signPayment();
+    }
+  }, [paymentRequiredPayload, core, signer]);
+
   const fetchProtectedAsset = useCallback(async (url: string) => {
     setCurrentUrl(url);
     setStatus("fetching");
@@ -78,34 +106,6 @@ export const useX402 = () => {
       setStatus("error");
     }
   }, []);
-
-  useEffect(() => {
-    if (signature && currentUrl) {
-      const submitPayment = async () => {
-        setStatus("fetching");
-        const headers = new Headers();
-        headers.set("PAYMENT-SIGNATURE", signature);
-
-        const raw = await fetch(currentUrl, { headers });
-
-        if (raw.status === 200) {
-          const res = await raw.json();
-          setStatus("success");
-          setContent(res);
-        } else {
-          setError(`Payment failed: ${raw.status}`);
-          setStatus("error");
-        }
-      };
-      submitPayment();
-    }
-  }, [signature, currentUrl]);
-
-  useEffect(() => {
-    if (paymentRequiredPayload && core && signer) {
-      signPayment();
-    }
-  }, [paymentRequiredPayload, core, signer]);
 
   const signPayment = async () => {
     if (!paymentRequiredPayload || !core || !signer) {
