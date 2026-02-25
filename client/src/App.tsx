@@ -1,20 +1,17 @@
-import { useAccount, useConnect, useDisconnect } from 'wagmi'
-import { injected } from 'wagmi/connectors'
+import { useAccount, useConnect, useDisconnect } from "wagmi";
+import { injected } from "wagmi/connectors";
 
 function CustomConnectButton() {
-  const { address, isConnected } = useAccount()
-  const { connect } = useConnect()
-  const { disconnect } = useDisconnect()
+  const { address, isConnected } = useAccount();
+  const { connect } = useConnect();
+  const { disconnect } = useDisconnect();
 
   if (isConnected && address) {
     return (
-      <button
-        onClick={() => disconnect()}
-        className="rainbow-button"
-      >
+      <button onClick={() => disconnect()} className="rainbow-button">
         {address.slice(0, 6)}...{address.slice(-4)}
       </button>
-    )
+    );
   }
 
   return (
@@ -24,7 +21,7 @@ function CustomConnectButton() {
     >
       Connect
     </button>
-  )
+  );
 }
 
 function App() {
@@ -35,10 +32,10 @@ function App() {
           EVVM + x402
         </h1>
       </header>
-      
+
       <CustomConnectButton />
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
