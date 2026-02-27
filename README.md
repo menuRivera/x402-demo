@@ -17,7 +17,7 @@ sequenceDiagram
 
     Client->>Backend: 4. GET /protected + PAYMENT-SIGNATURE header
     Backend->>Backend: 5. Validate signature off-chain
-    Backend->>EVVM 6. Settle payment
+    Backend->>EVVM: 6. Settle payment
     Backend-->>Client: 7. Protected content
 ```
 
