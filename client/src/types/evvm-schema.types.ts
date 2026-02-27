@@ -1,0 +1,19 @@
+import type { HexString } from "@evvm/evvm-js";
+
+export interface IExactEvvmSchema {
+  scheme: "evvm";
+  network: `eip155:${number}`;
+  amount: string;
+  asset: HexString;
+  payTo: string;
+  maxTimeoutSeconds: number;
+  /**
+   * Custom metadata for successful evvm signature construction
+   */
+  extra: {
+    coreContractAddress: HexString;
+    evvmId?: number;
+    executor?: HexString;
+  };
+}
+
