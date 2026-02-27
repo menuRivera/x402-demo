@@ -16,8 +16,9 @@ A React frontend application for making x402 payments. Connect your wallet and p
 - Wallet connection (MetaMask, Rainbow, Coinbase Wallet, etc.)
 - Automatic x402 payment handling
 - Multi-chain support (Ethereum, Polygon, Base, Optimism, etc.)
-- Payment signature signing (EIP-3009)
+- EVVM payment signature signing (off-chain, gasless)
 - Protected content access after payment
+- Balance fetching from EVVM
 
 ## Getting Started
 
@@ -69,9 +70,10 @@ npm run preview
 2. User requests protected content from the backend
 3. Backend returns `402 Payment Required` with payment requirements
 4. App detects the 402 response and extracts payment requirements
-5. User signs an EIP-3009 authorization (gasless signature)
+5. User signs an EVVM payment authorization (off-chain, gasless)
 6. App retries the request with the payment signature
-7. Backend verifies and serves the protected content
+7. Backend validates the signature using EVVM (off-chain)
+8. Backend serves the protected content
 
 ```mermaid
 sequenceDiagram
@@ -87,12 +89,13 @@ sequenceDiagram
     Client->>Backend: GET /protected
     Backend-->>Client: 402 Payment Required
     
-    Client->>Wallet: Request EIP-3009 signature
+    Client->>Wallet: Request EVVM signature
     Wallet-->>User: Signature request
     User->>Wallet: Approve
     Wallet-->>Client: Signed authorization
     
     Client->>Backend: GET /protected + PAYMENT-SIGNATURE
+    Backend->>Backend: Validate with EVVM (off-chain)
     Backend-->>Client: Protected content
     Client-->>User: Display content
 ```
@@ -104,12 +107,12 @@ client/
 ├── src/
 │   ├── components/           # React components
 │   │   └── JsonViewer.tsx    # JSON display component
-│   ├── hooks/                 # Custom React hooks
+│   ├── hooks/                # Custom React hooks
 │   │   ├── useX402.ts        # x402 payment handling
-│   │   └── useEVVM.ts       # EVVM utilities
-│   ├── providers/             # React context providers
-│   │   └── Web3Provider.tsx # Wallet provider
-│   ├── types/                 # TypeScript types
+│   │   └── useEVVM.ts        # EVVM utilities
+│   ├── providers/            # React context providers
+│   │   └── Web3Provider.tsx  # Wallet provider
+│   ├── types/                # TypeScript types
 │   │   ├── payment-required-payload.types.ts
 │   │   ├── payment-payload.types.ts
 │   │   └── evvm-schema.types.ts
@@ -126,13 +129,11 @@ client/
 The `useX402` hook handles the payment flow automatically:
 
 ```typescript
-const { request, response, isLoading, error } = useX402();
+const { status, content, error, paymentDetails, fetchProtectedAsset } = useX402();
 
 const handleRequest = async () => {
-  const result = await request('http://localhost:3000/protected');
-  if (result.ok) {
-    console.log('Content:', result.data);
-  }
+  await fetchProtectedAsset('http://localhost:3000/protected');
+  // status: 'success' when content is available
 };
 ```
 
@@ -141,16 +142,13 @@ const handleRequest = async () => {
 To make payments, you need:
 
 1. A Web3 wallet (MetaMask, Rainbow, Coinbase Wallet, etc.)
-2. Testnet tokens:
-   - **ETH** on Sepolia for gas
-   - **USDC** on Sepolia for payments
+2. Testnet tokens on **Ethereum Sepolia**:
+   - **MATE** for payments (get from EVVM faucet)
+   - No ETH needed for gas (facilitator covers it)
 
 ### Getting Test Tokens
 
-| Token | Faucet |
-|-------|--------|
-| ETH (Sepolia) | [Alchemy Faucet](https://www.alchemy.com/faucets/ethereum-sepolia) |
-| USDC (Sepolia) | [Circle Faucet](https://faucet.circle.com/) |
+Get testnet tokens from the [EVVM Faucet](https://evvm.dev).
 
 ## Environment Variables
 
@@ -167,4 +165,5 @@ To make payments, you need:
 - [x402 Specification](https://github.com/coinbase/x402)
 - [Wagmi Documentation](https://wagmi.sh)
 - [RainbowKit Documentation](https://www.rainbowkit.com)
-- [EIP-3009: Transfer With Authorization](https://eips.ethereum.org/EIPS/eip-3009)
+- [EVVM Documentation](https://github.com/evmvm/evvm-js)
+- [EVVM Faucet](https://evvm.dev)

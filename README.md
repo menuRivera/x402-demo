@@ -9,26 +9,24 @@ sequenceDiagram
     participant Client
     participant Backend
     participant EVVM
-    participant Blockchain
 
     Client->>Backend: 1. GET /protected
     Backend-->>Client: 2. 402 Payment Required + PaymentRequired header
     
-    Note over Client: 3. Sign EIP-3009 authorization
+    Note over Client: 3. Sign EVVM payment
     
     Client->>Backend: 4. GET /protected + PAYMENT-SIGNATURE header
-    Backend->>EVVM: 5. Validate signature
-    EVVM-->>Backend: 6. { isValid: true, payer: "0x..." }
-    Backend->>Blockchain: 7. Verify on-chain (optional)
-    Backend-->>Client: 8. { data: "Hello World" }
+    Backend->>EVVM: 5. Validate signature off-chain
+    EVVM-->>Backend: 6. isValid: true, payer: "0x..."
+    Backend-->>Client: 7. Protected content
 ```
 
 ## Projects
 
 | Project | Port | Description |
 |---------|------|-------------|
-| **backend** | 3000 | Nitro server with EVVM for native payment processing |
-| **client** | 5173 | React frontend for making x402 payments |
+| backend | 3000 | Nitro server with EVVM for native payment processing |
+| client | 5173 | React frontend for making x402 payments |
 
 ## Quick Start
 
@@ -58,29 +56,18 @@ Open http://localhost:5173 in your browser.
 |--------|----------|-------|-------------|
 | GET | `/protected` | Paid | Protected endpoint requiring x402 payment |
 | GET | `/status` | Free | Server status and configuration |
-| GET | `/health` | Free | Health check |
-
-### Client (`:5173`)
-
-The frontend provides a UI for:
-- Connecting wallets (MetaMask, Rainbow, Coinbase Wallet, etc.)
-- Viewing server status
-- Making protected requests
 
 ## Prerequisites
 
 1. Node.js 18+
 2. A Web3 wallet (MetaMask, Rainbow, Coinbase Wallet, etc.)
 3. Testnet tokens on **Ethereum Sepolia**:
-   - **ETH** for gas fees
-   - **USDC** for payments
+   - **ETH** for gas fees (paid by facilitator)
+   - **MATE** for payments
 
 ### Get Testnet Tokens
 
-| Token | Faucet |
-|-------|--------|
-| **ETH** | [Alchemy Faucet](https://www.alchemy.com/faucets/ethereum-sepolia) |
-| **USDC** | [Circle Faucet](https://faucet.circle.com/) → Select "Ethereum Sepolia" |
+Get testnet tokens from the [EVVM Faucet](https://evvm.dev).
 
 ## Network Configuration
 
@@ -88,9 +75,9 @@ The frontend provides a UI for:
 |-----------|-------|
 | **Chain** | Ethereum Sepolia (testnet) |
 | **Network ID** | `eip155:11155111` |
-| **Token** | USDC |
-| **Token Address** | `0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238` |
-| **Price per request** | 0.1 USDC |
+| **Token** | MATE |
+| **Token Address** | `0x0000000000000000000000000000000000000001` |
+| **Price per request** | 0.1 MATE |
 
 ## How x402 Works
 
@@ -100,7 +87,7 @@ flowchart LR
     B -->|2. 402 + Requirements| A
     A -->|3. Sign Payment| A
     A -->|4. Request + Signature| B
-    B -->|5. Validate| C[EVVM]
+    B -->|5. Validate Off-chain| C[EVVM]
     C -->|6. Valid| B
     B -->|7. Content| A
 ```
@@ -109,16 +96,17 @@ flowchart LR
 
 1. **Client** requests a protected resource (`GET /protected`)
 2. **Backend** responds with `402 Payment Required` + payment requirements
-3. **Client** signs an EIP-3009 authorization (gasless signature)
+3. **Client** signs an EVVM payment authorization (off-chain, gasless)
 4. **Client** retries the request with the `PAYMENT-SIGNATURE` header
-5. **Backend** validates the signature using EVVM
+5. **Backend** validates the signature using EVVM (off-chain)
 6. **Backend** serves the protected content
 
-### Why EIP-3009?
+### Key Features
 
 - **Gasless for users**: Client only signs, doesn't pay gas
-- **Atomic payments**: Payment and content delivery are linked
-- **Secure**: Uses typed data signatures (EIP-712)
+- **Off-chain validation**: EVVM validates signatures without on-chain calls
+- **Facilitator pays gas**: Gas fees are covered by the facilitator
+- **EVVM scheme**: Uses EVVM for payment validation
 
 ## Project Structure
 
@@ -150,8 +138,7 @@ x402-demo/
 - [x402 Documentation](https://docs.cdp.coinbase.com/x402/welcome)
 - [x402.org](https://x402.org)
 - [EVVM Documentation](https://github.com/evmvm/evvm-js)
-- [EIP-3009: Transfer With Authorization](https://eips.ethereum.org/EIPS/eip-3009)
-- [Circle USDC Faucet](https://faucet.circle.com/)
+- [EVVM Faucet](https://evvm.dev)
 
 ## License
 

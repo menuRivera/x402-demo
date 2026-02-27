@@ -22,7 +22,7 @@ const VENDOR_URL = process.env.VENDOR_URL || "http://localhost:3002";
 
 // Validate required environment variables
 if (!process.env.EVM_PRIVATE_KEY) {
-  console.error("❌ EVM_PRIVATE_KEY environment variable is required");
+  console.error("EVM_PRIVATE_KEY environment variable is required");
   console.error("   Add your testnet private key to .env file");
   process.exit(1);
 }
@@ -32,12 +32,12 @@ const evmSigner = privateKeyToAccount(
   process.env.EVM_PRIVATE_KEY as `0x${string}`
 );
 
-console.log("\n" + "═".repeat(60));
+console.log("\n" + "=".repeat(60));
 console.log("           x402 CLIENT - Payment Demo");
-console.log("═".repeat(60));
-console.log(`\n🔑 Client Wallet: ${evmSigner.address}`);
-console.log(`🌐 Network: Ethereum Sepolia (eip155:11155111)`);
-console.log(`🎯 Vendor URL: ${VENDOR_URL}`);
+console.log("=".repeat(60));
+console.log(`\nClient Wallet: ${evmSigner.address}`);
+console.log(`Network: Ethereum Sepolia (eip155:11155111)`);
+console.log(`Vendor URL: ${VENDOR_URL}`);
 
 // Create public client for balance check
 const publicClient = createPublicClient({
@@ -45,16 +45,16 @@ const publicClient = createPublicClient({
   transport: http(),
 });
 
-// USDC on Ethereum Sepolia
-const USDC_ADDRESS = "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238" as const;
+// MATE on Ethereum Sepolia
+const MATE_ADDRESS = "0x0000000000000000000000000000000000000001" as const;
 
 /**
- * Check USDC balance
+ * Check MATE balance
  */
 async function checkBalance(): Promise<number> {
   try {
     const balance = await publicClient.readContract({
-      address: USDC_ADDRESS,
+      address: MATE_ADDRESS,
       abi: [
         {
           name: "balanceOf",
@@ -68,7 +68,7 @@ async function checkBalance(): Promise<number> {
       args: [evmSigner.address],
     });
 
-    const formatted = Number(balance) / 1e6; // USDC has 6 decimals
+    const formatted = Number(balance) / 1e18; // MATE has 18 decimals
     return formatted;
   } catch (error) {
     console.error("   Error checking balance:", error);
@@ -80,9 +80,9 @@ async function checkBalance(): Promise<number> {
  * Make a paid request to the vendor
  */
 async function makePaidRequest(): Promise<void> {
-  console.log("\n" + "─".repeat(60));
-  console.log("🔄 [STEP 1] Making initial request to protected endpoint");
-  console.log("─".repeat(60));
+  console.log("\n" + "-".repeat(60));
+  console.log("[STEP 1] Making initial request to protected endpoint");
+  console.log("-".repeat(60));
   console.log(`   URL: ${VENDOR_URL}/api/hello`);
   console.log("   Method: GET");
   console.log("   Payment: None (will receive 402)");
@@ -95,13 +95,13 @@ async function makePaidRequest(): Promise<void> {
   const fetchWithPayment = wrapFetchWithPayment(fetch, client);
 
   try {
-    console.log("\n" + "─".repeat(60));
-    console.log("🔄 [STEP 2] Sending request (x402 handles payment automatically)");
-    console.log("─".repeat(60));
-    console.log("   📤 Request sent...");
-    console.log("   ⏳ Waiting for 402 Payment Required...");
-    console.log("   ✍️  Signing EIP-3009 authorization...");
-    console.log("   📤 Retrying with PAYMENT-SIGNATURE header...");
+    console.log("\n" + "-".repeat(60));
+    console.log("[STEP 2] Sending request (x402 handles payment automatically)");
+    console.log("-".repeat(60));
+    console.log("   Request sent...");
+    console.log("   Waiting for 402 Payment Required...");
+    console.log("   Signing EIP-3009 authorization...");
+    console.log("   Retrying with PAYMENT-SIGNATURE header...");
 
     const response = await fetchWithPayment(`${VENDOR_URL}/api/hello`, {
       method: "GET",
@@ -110,10 +110,10 @@ async function makePaidRequest(): Promise<void> {
     if (response.ok) {
       const data = await response.json();
       
-      console.log("\n" + "─".repeat(60));
-      console.log("✅ [STEP 3] Request successful - Content received!");
-      console.log("─".repeat(60));
-      console.log("\n📦 Response Body:");
+      console.log("\n" + "-".repeat(60));
+      console.log("[STEP 3] Request successful - Content received!");
+      console.log("-".repeat(60));
+      console.log("\nResponse Body:");
       console.log(JSON.stringify(data, null, 2));
 
       // Get payment settlement details
@@ -123,23 +123,23 @@ async function makePaidRequest(): Promise<void> {
       );
 
       if (paymentResponse) {
-        console.log("\n" + "─".repeat(60));
-        console.log("💰 [STEP 4] Payment Settlement Details");
-        console.log("─".repeat(60));
-        console.log(`   ✅ Success: ${paymentResponse.success}`);
-        console.log(`   📜 TX Hash: ${paymentResponse.transaction}`);
-        console.log(`   🌐 Network: ${paymentResponse.network}`);
-        console.log(`   👤 Payer: ${paymentResponse.payer}`);
-        console.log(`\n   🔗 View on Etherscan:`);
+        console.log("\n" + "-".repeat(60));
+        console.log("[STEP 4] Payment Settlement Details");
+        console.log("-".repeat(60));
+        console.log(`   Success: ${paymentResponse.success}`);
+        console.log(`   TX Hash: ${paymentResponse.transaction}`);
+        console.log(`   Network: ${paymentResponse.network}`);
+        console.log(`   Payer: ${paymentResponse.payer}`);
+        console.log(`\n   View on Etherscan:`);
         console.log(`   https://sepolia.etherscan.io/tx/${paymentResponse.transaction}`);
       }
     } else {
-      console.error(`\n❌ Request failed with status: ${response.status}`);
+      console.error(`\nRequest failed with status: ${response.status}`);
       const text = await response.text();
       console.error("   Response:", text);
     }
   } catch (error) {
-    console.error("\n❌ Error:", error);
+    console.error("\nError:", error);
   }
 }
 
@@ -147,32 +147,32 @@ async function makePaidRequest(): Promise<void> {
  * Test public endpoint (no payment required)
  */
 async function testPublicEndpoint(): Promise<void> {
-  console.log("\n" + "─".repeat(60));
-  console.log("📡 Testing public endpoint (no payment required)");
-  console.log("─".repeat(60));
+  console.log("\n" + "-".repeat(60));
+  console.log("Testing public endpoint (no payment required)");
+  console.log("-".repeat(60));
   console.log(`   URL: ${VENDOR_URL}/api/info`);
 
   try {
     const response = await fetch(`${VENDOR_URL}/api/info`);
     const data = await response.json();
-    console.log("   ✅ Response:", JSON.stringify(data, null, 2));
+    console.log("   Response:", JSON.stringify(data, null, 2));
   } catch (error) {
-    console.error("   ❌ Error:", error);
+    console.error("   Error:", error);
   }
 }
 
 // Main execution
 async function main(): Promise<void> {
   // Check initial balance
-  console.log("\n" + "─".repeat(60));
-  console.log("💰 Checking initial USDC balance");
-  console.log("─".repeat(60));
+  console.log("\n" + "-".repeat(60));
+  console.log("Checking initial MATE balance");
+  console.log("-".repeat(60));
   const balanceBefore = await checkBalance();
-  console.log(`   Balance: ${balanceBefore} USDC`);
+  console.log(`   Balance: ${balanceBefore} MATE`);
 
   if (balanceBefore < 0.1) {
-    console.log("\n⛔ Insufficient balance for payment (need 0.1 USDC)");
-    console.log("   Get testnet USDC: https://faucet.circle.com/");
+    console.log("\nInsufficient balance for payment (need 0.1 MATE)");
+    console.log("   Get testnet MATE: https://evvm.dev");
     process.exit(1);
   }
 
@@ -183,16 +183,16 @@ async function main(): Promise<void> {
   await makePaidRequest();
 
   // Check final balance
-  console.log("\n" + "─".repeat(60));
-  console.log("💰 Checking final USDC balance");
-  console.log("─".repeat(60));
+  console.log("\n" + "-".repeat(60));
+  console.log("Checking final MATE balance");
+  console.log("-".repeat(60));
   const balanceAfter = await checkBalance();
-  console.log(`   Balance: ${balanceAfter} USDC`);
-  console.log(`   Spent: ${(balanceBefore - balanceAfter).toFixed(2)} USDC`);
+  console.log(`   Balance: ${balanceAfter} MATE`);
+  console.log(`   Spent: ${(balanceBefore - balanceAfter).toFixed(2)} MATE`);
 
-  console.log("\n" + "═".repeat(60));
-  console.log("   ✨ Demo complete!");
-  console.log("═".repeat(60) + "\n");
+  console.log("\n" + "=".repeat(60));
+  console.log("   Demo complete!");
+  console.log("=".repeat(60) + "\n");
 }
 
 main().catch(console.error);
