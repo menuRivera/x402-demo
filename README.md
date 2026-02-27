@@ -11,22 +11,22 @@ sequenceDiagram
     participant EVVM
 
     Client->>Backend: 1. GET /protected
-    Backend-->>Client: 2. 402 Payment Required + PaymentRequired header
-    
+    Backend-->>Client: 2. 402 Payment Required + PAYMENT-REQUIRED header
+
     Note over Client: 3. Sign EVVM payment
-    
+
     Client->>Backend: 4. GET /protected + PAYMENT-SIGNATURE header
-    Backend->>EVVM: 5. Validate signature off-chain
-    EVVM-->>Backend: 6. isValid: true, payer: "0x..."
+    Backend->>Backend: 5. Validate signature off-chain
+    Backend->>EVVM 6. Settle payment
     Backend-->>Client: 7. Protected content
 ```
 
 ## Projects
 
-| Project | Port | Description |
-|---------|------|-------------|
+| Project | Port | Description                                          |
+| ------- | ---- | ---------------------------------------------------- |
 | backend | 3000 | Nitro server with EVVM for native payment processing |
-| client | 5173 | React frontend for making x402 payments |
+| client  | 5173 | React frontend for making x402 payments              |
 
 ## Quick Start
 
@@ -52,10 +52,10 @@ Open http://localhost:5173 in your browser.
 
 ### Backend (`:3000`)
 
-| Method | Endpoint | Price | Description |
-|--------|----------|-------|-------------|
-| GET | `/protected` | Paid | Protected endpoint requiring x402 payment |
-| GET | `/status` | Free | Server status and configuration |
+| Method | Endpoint     | Price | Description                               |
+| ------ | ------------ | ----- | ----------------------------------------- |
+| GET    | `/protected` | Paid  | Protected endpoint requiring x402 payment |
+| GET    | `/status`    | Free  | Server status                             |
 
 ## Prerequisites
 
@@ -71,13 +71,13 @@ Get testnet tokens from the [EVVM Faucet](https://evvm.dev).
 
 ## Network Configuration
 
-| Parameter | Value |
-|-----------|-------|
-| **Chain** | Ethereum Sepolia (testnet) |
-| **Network ID** | `eip155:11155111` |
-| **Token** | MATE |
-| **Token Address** | `0x0000000000000000000000000000000000000001` |
-| **Price per request** | 0.1 MATE |
+| Parameter             | Value                                        |
+| --------------------- | -------------------------------------------- |
+| **Chain**             | Ethereum Sepolia (testnet)                   |
+| **Network ID**        | `eip155:11155111`                            |
+| **Token**             | MATE                                         |
+| **Token Address**     | `0x0000000000000000000000000000000000000001` |
+| **Price per request** | 0.1 MATE                                     |
 
 ## How x402 Works
 
@@ -87,8 +87,8 @@ flowchart LR
     B -->|2. 402 + Requirements| A
     A -->|3. Sign Payment| A
     A -->|4. Request + Signature| B
-    B -->|5. Validate Off-chain| C[EVVM]
-    C -->|6. Valid| B
+    B -->|5. Validate| B
+    B -->|6. Settle payment onchain| C[EVVM]
     B -->|7. Content| A
 ```
 
@@ -137,9 +137,5 @@ x402-demo/
 - [x402 Specification](https://github.com/coinbase/x402)
 - [x402 Documentation](https://docs.cdp.coinbase.com/x402/welcome)
 - [x402.org](https://x402.org)
-- [EVVM Documentation](https://github.com/evmvm/evvm-js)
+- [EVVM Documentation](https://evvm.info)
 - [EVVM Faucet](https://evvm.dev)
-
-## License
-
-Apache-2.0
