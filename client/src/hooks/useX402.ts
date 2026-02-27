@@ -9,6 +9,7 @@ export type Status =
   | "fetching"
   | "payment-required"
   | "signing"
+  | "fetching-with-signature"
   | "success"
   | "error";
 
@@ -36,7 +37,7 @@ export const useX402 = () => {
   useEffect(() => {
     if (signature && currentUrl) {
       const submitPayment = async () => {
-        setStatus("fetching");
+        setStatus("fetching-with-signature");
         const headers = new Headers();
         headers.set("PAYMENT-SIGNATURE", signature);
 

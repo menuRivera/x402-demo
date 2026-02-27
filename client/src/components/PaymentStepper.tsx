@@ -9,6 +9,7 @@ interface PaymentStepperProps {
 const steps = [
   { key: "fetching", label: "Fetch", description: "Requesting resource" },
   { key: "authorize", label: "Authorize", description: "Signing payment transaction" },
+  { key: "fetching-with-signature", label: "Confirm", description: "Completing request with payment" },
   { key: "success", label: "Done", description: "Resource received" },
 ] as const;
 
@@ -44,8 +45,10 @@ export function PaymentStepper({ status, paymentDetails }: PaymentStepperProps) 
       case "payment-required":
       case "signing":
         return 1;
-      case "success":
+      case "fetching-with-signature":
         return 2;
+      case "success":
+        return 3;
       case "error":
         return -1;
       default:
@@ -55,7 +58,7 @@ export function PaymentStepper({ status, paymentDetails }: PaymentStepperProps) 
 
   const currentIndex = getStepIndex(status);
   const isError = status === "error";
-  const showAuthorizeDetails = (status === "payment-required" || status === "signing") && paymentDetails;
+  const showPaymentDetails = (status === "payment-required" || status === "signing" || status === "fetching-with-signature") && paymentDetails;
 
   if (status === "idle") return null;
 
@@ -83,7 +86,7 @@ export function PaymentStepper({ status, paymentDetails }: PaymentStepperProps) 
                 >
                   {isCompleted ? "✓" : isActive ? "●" : index + 1}
                 </div>
-                <div className="mt-2 text-center">
+                <div className="mt-2 text-center min-w-[70px]">
                   <span
                     className={`
                       block text-xs font-mono uppercase tracking-wider
@@ -116,26 +119,26 @@ export function PaymentStepper({ status, paymentDetails }: PaymentStepperProps) 
         })}
       </div>
 
-      {showAuthorizeDetails && (
+      {showPaymentDetails && (
         <div className="mt-4 bg-white border border-zinc-200 rounded-lg p-4 w-full max-w-sm shadow-sm">
           <div className="space-y-2 font-mono text-xs">
             <div className="flex justify-between items-center py-1 border-b border-zinc-100">
               <span className="text-zinc-500">Amount</span>
               <span className="text-zinc-800 font-medium">
-                {paymentDetails.amount} {paymentDetails.token}
+                {paymentDetails?.amount} {paymentDetails?.token}
               </span>
             </div>
             <div className="flex justify-between items-center py-1 border-b border-zinc-100">
               <span className="text-zinc-500">To</span>
-              <span className="text-zinc-600">{paymentDetails.recipient}</span>
+              <span className="text-zinc-600">{paymentDetails?.recipient}</span>
             </div>
             <div className="flex justify-between items-center py-1 border-b border-zinc-100">
               <span className="text-zinc-500">Network</span>
-              <span className="text-zinc-600">{formatNetwork(paymentDetails.network)}</span>
+              <span className="text-zinc-600">{formatNetwork(paymentDetails?.network || "")}</span>
             </div>
             <div className="flex justify-between items-center py-1">
               <span className="text-zinc-500">Timeout</span>
-              <span className="text-zinc-600">{formatTimeout(paymentDetails.maxTimeout)}</span>
+              <span className="text-zinc-600">{formatTimeout(paymentDetails?.maxTimeout || 0)}</span>
             </div>
           </div>
         </div>

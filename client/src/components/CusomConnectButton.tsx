@@ -19,7 +19,7 @@ export function CustomConnectButton() {
       onClick={() => connect({ connector: injected() })}
       className="rainbow-button"
     >
-      Connect
+      Connect Wallet
     </button>
   );
 }
