@@ -8,7 +8,7 @@ const config = useRuntimeConfig();
 const defaultOffer: IExactEvvmSchema = {
   scheme: "evvm",
   network: `eip155:11155111`, // sepolia
-  amount: "10000",
+  amount: "100000000000000000",
   asset: mateToken,
   payTo: config.receiver,
   maxTimeoutSeconds: 30,

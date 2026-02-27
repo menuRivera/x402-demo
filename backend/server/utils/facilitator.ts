@@ -1,7 +1,6 @@
 import { execute } from "@evvm/evvm-js";
 import {
   IPaymentPayload,
-  isPaymentPayload,
 } from "../types/payment-payload.types";
 
 /**

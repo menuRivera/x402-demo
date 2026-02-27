@@ -16,6 +16,8 @@ export interface PaymentDetails {
   amount: string;
   token: string;
   recipient: string;
+  network: string;
+  maxTimeout: number;
 }
 
 export const useX402 = () => {
@@ -89,9 +91,11 @@ export const useX402 = () => {
 
         const required = _paymentPayload.offers[0];
         setPaymentDetails({
-          amount: (Number(required.amount) / 1e6).toFixed(2),
-          token: "USDC",
+          amount: (Number(required.amount) / 1e18).toFixed(1),
+          token: "MATE",
           recipient: `${required.payTo.slice(0, 6)}...${required.payTo.slice(-4)}`,
+          network: required.network,
+          maxTimeout: required.maxTimeoutSeconds,
         });
       } catch (err) {
         setError("Failed to parse payment required response");
