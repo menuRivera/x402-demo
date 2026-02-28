@@ -1,4 +1,5 @@
 import { HexString } from "@evvm/evvm-js";
+import { SettleResponse } from "@x402/core/types";
 import { IExactEvvmSchema } from "server/types";
 
 const mateToken = "0x0000000000000000000000000000000000000001";
@@ -42,6 +43,20 @@ export const paymentRequiredResponse = (): Response => {
  * Returned when an invalid response is received
  */
 export const invalidPaymentResponse = (reason: string): Response => {
+  const settleResponse: SettleResponse = {
+    success: false,
+    errorMessage: "Invalid Payment",
+    errorReason: reason,
+    transaction: "",
+    network: ":",
+  };
+
+  const jsonString = JSON.stringify(settleResponse);
+  const base64Payload = Buffer.from(jsonString).toString("base64");
+
+  const headers = new Headers();
+  headers.set("PAYMENT-RESPONSE", base64Payload);
+
   console.log("Payment invalid");
-  return new Response(`Payment Invalid: ${reason}`, { status: 400 });
+  return new Response(`Payment Invalid: ${reason}`, { status: 400, headers });
 };

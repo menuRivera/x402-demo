@@ -22,7 +22,6 @@ export default defineEventHandler(async (event) => {
 
   const paymentPayload = await verifyPayment(paymentSignature);
   if (!paymentPayload)
-    // fails here
     return invalidPaymentResponse("Couldn't verify signature");
 
   const txHash = await settlePayment(paymentPayload);
