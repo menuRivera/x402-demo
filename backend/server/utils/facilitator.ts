@@ -1,7 +1,5 @@
 import { execute } from "@evvm/evvm-js";
-import {
-  IPaymentPayload,
-} from "../types/payment-payload.types";
+import { IPaymentPayload } from "../types/payment-payload.types";
 
 /**
  * Verifies the payment can be executed (check balances, signatures, etc)

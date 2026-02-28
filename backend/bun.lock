@@ -5,7 +5,7 @@
     "": {
       "name": "nitro-app",
       "dependencies": {
-        "@evvm/evvm-js": "0.1.22",
+        "@evvm/evvm-js": "0.1.23",
         "@x402/core": "^2.4.0",
         "viem": "2.45.0",
       },
@@ -80,7 +80,7 @@
 
     "@esbuild/win32-x64": ["@esbuild/win32-x64@0.27.3", "", { "os": "win32", "cpu": "x64" }, "sha512-4uJGhsxuptu3OcpVAzli+/gWusVGwZZHTlS63hh++ehExkVT8SgiEf7/uC/PclrPPkLhZqGgCTjd0VWLo6xMqA=="],
 
-    "@evvm/evvm-js": ["@evvm/evvm-js@0.1.22", "", { "dependencies": { "crypto-browserify": "^3.12.1", "ethers": "^6.16.0", "viem": "2.45.0" }, "peerDependencies": { "typescript": "^5" } }, "sha512-jtwNmP1Ov4/+YIbUK8p9HSNGNMkyxH+Hs6r1FWYn2mhW7Efel5Y4vpOyrtuzVhkbHh8OjTGmDuGw0Ly4yIlu7A=="],
+    "@evvm/evvm-js": ["@evvm/evvm-js@0.1.23", "", { "dependencies": { "crypto-browserify": "^3.12.1", "ethers": "^6.16.0", "viem": "2.45.0" }, "peerDependencies": { "typescript": "^5" } }, "sha512-mPNJTK2pQCDDBniDvhmMfZwK+GmEqvBt2mcLM7a46QZdxaoMTF48D93oEJMMH4HXxgeC2RAlQCCAHEfj6YXwzw=="],
 
     "@ioredis/commands": ["@ioredis/commands@1.5.0", "", {}, "sha512-eUgLqrMf8nJkZxT24JvVRrQya1vZkQh8BBeYNwGDqa5I0VUi8ACx7uFvAaLxintokpTenkK6DASvo/bvNbBGow=="],
 

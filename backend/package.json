@@ -11,7 +11,7 @@
     "nitropack": "^2.12.4"
   },
   "dependencies": {
-    "@evvm/evvm-js": "0.1.22",
+    "@evvm/evvm-js": "0.1.23",
     "@x402/core": "^2.4.0",
     "viem": "2.45.0"
   }

@@ -3,6 +3,8 @@
 // PAYMENT-SIGNATURE
 // PAYMENT-RESPONSE
 
+import { SettleResponse } from "@x402/core/types";
+
 export default defineEventHandler(async (event) => {
   // include only /protected route
   const url = event.node.req.url;
@@ -25,6 +27,18 @@ export default defineEventHandler(async (event) => {
 
   const txHash = await settlePayment(paymentPayload);
   if (!txHash) return invalidPaymentResponse("Settlement failed");
+
+  const settleResponse: SettleResponse = {
+    success: true,
+    payer: paymentPayload.payload.data.from,
+    transaction: txHash,
+    network: paymentPayload.accepted.network,
+  };
+
+  const jsonString = JSON.stringify(settleResponse);
+  const base64Payload = Buffer.from(jsonString).toString("base64");
+
+  appendHeader(event, "PAYMENT-RESPONSE", base64Payload);
 
   return;
 });
