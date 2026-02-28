@@ -26,6 +26,7 @@ A React frontend application for making x402 payments. Connect your wallet and p
 
 ```bash
 npm install
+cp .env.example .env
 ```
 
 ### Configuration
@@ -36,11 +37,7 @@ Create a `.env` file based on `.env.example`:
 cp .env.example .env
 ```
 
-Configure your environment variables:
-
-```bash
-VITE_WALLET_CONNECT_PROJECT_ID=your_project_id
-```
+Edit the values in `.env` with your own configuration.
 
 ### Development
 
@@ -106,12 +103,17 @@ sequenceDiagram
 client/
 ├── src/
 │   ├── components/           # React components
-│   │   └── JsonViewer.tsx    # JSON display component
+│   │   ├── JsonViewer.tsx    # JSON display component
+│   │   ├── PaymentStepper.tsx # Payment flow stepper
+│   │   ├── PaymentDetails.tsx # Payment details display
+│   │   └── CusomConnectButton.tsx # Custom connect button
 │   ├── hooks/                # Custom React hooks
 │   │   ├── useX402.ts        # x402 payment handling
 │   │   └── useEVVM.ts        # EVVM utilities
 │   ├── providers/            # React context providers
 │   │   └── Web3Provider.tsx  # Wallet provider
+│   ├── lib/web3/            # Web3 utilities
+│   │   └── config.ts         # Wagmi and chain configuration
 │   ├── types/                # TypeScript types
 │   │   ├── payment-required-payload.types.ts
 │   │   ├── payment-payload.types.ts
@@ -121,7 +123,8 @@ client/
 │   └── index.css             # Global styles
 ├── package.json
 ├── vite.config.ts
-└── tsconfig.json
+├── tsconfig.json
+└── .env.example
 ```
 
 ## x402 Hook
@@ -155,6 +158,7 @@ Get testnet tokens from the [EVVM Faucet](https://evvm.dev).
 | Variable | Description |
 |----------|-------------|
 | `VITE_WALLET_CONNECT_PROJECT_ID` | WalletConnect project ID (required for WalletConnect) |
+| `VITE_EVVM_CONTRACT_ADDRESS` | EVVM core contract address (see `.env.example`) |
 
 ## Related Projects
 

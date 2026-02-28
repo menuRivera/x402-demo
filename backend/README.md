@@ -17,14 +17,12 @@ This backend implements x402 payments using the EVVM, which allows for EVM bytec
 sequenceDiagram
     participant Client
     participant Backend
-    participant EVVM
 
     Client->>Backend: GET /protected (no payment)
     Backend-->>Client: 402 Payment Required
     
     Client->>Backend: GET /protected + PAYMENT-SIGNATURE
-    Backend->>EVVM: Validate signature off-chain
-    EVVM-->>Backend: Validation result
+    Note over Backend: Validate with EVVM (off-chain)
     Backend-->>Client: Protected content
 ```
 
@@ -37,19 +35,28 @@ sequenceDiagram
 
 ## Configuration
 
-Create a `.env` file:
+Create a `.env` file based on `.env.example`:
 
 ```bash
-# .env
-PORT=3000
-# Add your configuration options here
+cp .env.example .env
 ```
+
+Configure your environment variables:
+
+| Variable | Description |
+| -------- | ------------ |
+| `RECEIVER_ACCOUNT` | Address receiving payments |
+| `EVVM_CORE_ADDRESS` | EVVM core contract address |
+| `EXECUTOR_PRIVATE_KEY` | Private key for the executor account |
 
 ## Running
 
 ```bash
 # Install dependencies
 npm install
+
+# Create environment file
+cp .env.example .env
 
 # Development with hot reload
 npm run dev
@@ -96,13 +103,20 @@ backend/
 │   ├── routes/
 │   │   ├── index.ts          # Main routes
 │   │   ├── protected/        # Protected endpoints
+│   │   │   └── index.get.ts
 │   │   └── status/           # Status endpoint
+│   │       └── index.get.ts
 │   ├── middleware/           # x402 payment middleware
-│   ├── utils/                # Helper functions
-│   └── types/                # TypeScript types
+│   │   ├── 1.preflight.ts
+│   │   └── 2.payment-required.ts
+│   ├── plugins/             # Nitro plugins
+│   │   └── logger.ts
+│   ├── utils/               # Helper functions
+│   └── types/               # TypeScript types
 ├── nitro.config.ts           # Nitro configuration
 ├── package.json
-└── tsconfig.json
+├── tsconfig.json
+└── .env.example
 ```
 
 ## Related Projects

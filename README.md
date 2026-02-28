@@ -69,6 +69,26 @@ Open http://localhost:5173 in your browser.
 
 Get testnet tokens from the [EVVM Faucet](https://evvm.dev).
 
+## Environment Variables
+
+### Backend
+
+Create a `.env` file in the `backend/` directory (see `backend/.env.example`):
+
+| Variable               | Description                          |
+| ---------------------- | ------------------------------------ |
+| `RECEIVER_ACCOUNT`     | Address receiving payments           |
+| `EVVM_CORE_ADDRESS`    | EVVM core contract address           |
+| `EXECUTOR_PRIVATE_KEY` | Private key for the executor account |
+
+### Client
+
+Create a `.env` file in the `client/` directory (see `client/.env.example`):
+
+| Variable                     | Description                |
+| ---------------------------- | -------------------------- |
+| `VITE_EVVM_CONTRACT_ADDRESS` | EVVM core contract address |
+
 ## Network Configuration
 
 | Parameter             | Value                                        |
@@ -115,7 +135,9 @@ x402-demo/
 ├── backend/                  # Port 3000
 │   ├── server/
 │   │   ├── routes/           # API routes
-│   │   ├── middleware/       # x402 payment middleware
+│   │   ├── middleware/           # x402 payment middleware
+│   │   ├── 1.preflight.ts      # Preflight request handling
+│   │   └── 2.payment-required.ts # Payment requirement handler
 │   │   ├── utils/            # Helper functions
 │   │   └── types/            # TypeScript types
 │   ├── nitro.config.ts       # Nitro configuration
