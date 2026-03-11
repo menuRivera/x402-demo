@@ -51,8 +51,8 @@ export const verifySignature = async (
   // verify nonces are ok
   if (signedAction.data.isAsyncExec) {
     // async execution, assert nonce hasn't been used before
-    const isValid = await core.isValidAsyncNonce(signedAction.data.nonce);
-    if (!isValid) {
+    const used = await core.isValidAsyncNonce(signedAction.data.nonce);
+    if (used) {
       console.error("Invalid async nonce");
       return false;
     }

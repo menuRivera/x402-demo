@@ -13,7 +13,7 @@ export interface IExactEvvmSchema {
   extra: {
     coreContractAddress: HexString;
     evvmId?: number;
-    executor?: HexString;
+    originExecutor?: HexString;
   };
 }
 

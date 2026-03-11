@@ -14,7 +14,7 @@ export interface IExactEvvmSchema extends PaymentRequirements {
   extra: {
     coreContractAddress: HexString;
     evvmId?: number;
-    executor?: HexString;
+    originExecutor?: HexString;
   };
 }
 

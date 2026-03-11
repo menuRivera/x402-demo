@@ -5,12 +5,12 @@ import { CustomConnectButton } from "./components/CusomConnectButton";
 import { useAccount } from "wagmi";
 
 function App() {
-  const { status, content, error, paymentDetails, fetchProtectedAsset } =
-    useX402();
+  const { status, content, error, paymentDetails, fetchProtectedAsset  } =
+    useX402("http://localhost:3000/protected");
   const { isConnected } = useAccount();
 
   const handleFetch = () => {
-    fetchProtectedAsset("http://localhost:3000/protected");
+    fetchProtectedAsset();
   };
 
   const isButtonDisabled =
