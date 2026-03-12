@@ -83,11 +83,7 @@ Create a `.env` file in the `backend/` directory (see `backend/.env.example`):
 
 ### Client
 
-Create a `.env` file in the `client/` directory (see `client/.env.example`):
-
-| Variable                     | Description                |
-| ---------------------------- | -------------------------- |
-| `VITE_EVVM_CONTRACT_ADDRESS` | EVVM core contract address |
+The client side doesn't need any environment variable.
 
 ## Network Configuration
 
