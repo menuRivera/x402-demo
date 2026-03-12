@@ -1,9 +1,9 @@
 import { IPayData, ISerializableSignedAction } from "@evvm/evvm-js";
-import { IExactEvvmSchema } from "./evvm-schema.types";
+import { IEvvmSchema } from "./evvm-schema.types";
 import { PaymentPayload } from "@x402/core/types";
 
 export interface IPaymentPayload extends PaymentPayload {
-  accepted: IExactEvvmSchema;
+  accepted: IEvvmSchema;
   // crucial, this includes everything needed to execute a pay transaction
   payload: ISerializableSignedAction<IPayData>;
 }

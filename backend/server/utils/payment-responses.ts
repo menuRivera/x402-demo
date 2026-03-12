@@ -1,12 +1,12 @@
 import { HexString } from "@evvm/evvm-js";
 import { SettleResponse } from "@x402/core/types";
-import { IExactEvvmSchema } from "server/types";
+import { IEvvmSchema } from "server/types";
 
 const mateToken = "0x0000000000000000000000000000000000000001";
 
 const config = useRuntimeConfig();
 
-const defaultOffer: IExactEvvmSchema = {
+const defaultOffer: IEvvmSchema = {
   scheme: "evvm",
   network: `eip155:11155111`, // sepolia
   amount: "100000000000000000",

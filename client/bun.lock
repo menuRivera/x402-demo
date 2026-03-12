@@ -5,7 +5,7 @@
     "": {
       "name": "client",
       "dependencies": {
-        "@evvm/evvm-js": "^0.1.21",
+        "@evvm/evvm-js": "0.1.26",
         "@rainbow-me/rainbowkit": "^2.2.10",
         "@tanstack/react-query": "^5.90.21",
         "react": "^19.2.0",
@@ -142,7 +142,7 @@
 
     "@eslint/plugin-kit": ["@eslint/plugin-kit@0.4.1", "", { "dependencies": { "@eslint/core": "^0.17.0", "levn": "^0.4.1" } }, "sha512-43/qtrDUokr7LJqoF2c3+RInu/t4zfrpYdoSDfYyhg52rwLV6TnOvdG4fXm7IkSB3wErkcmJS9iEhjVtOSEjjA=="],
 
-    "@evvm/evvm-js": ["@evvm/evvm-js@0.1.21", "", { "dependencies": { "crypto-browserify": "^3.12.1", "ethers": "^6.16.0", "viem": "2.45.0" }, "peerDependencies": { "typescript": "^5" } }, "sha512-9TkVcQExAI6PalgLtJdarmcuwEfkrFQtNP4hMHQ1me2wGhmBMZbbcZ0y/9u1chY9OiZdb3VkFh7S7cHq8bbOZQ=="],
+    "@evvm/evvm-js": ["@evvm/evvm-js@0.1.26", "", { "dependencies": { "crypto-browserify": "^3.12.1", "ethers": "^6.16.0", "viem": "2.45.0" }, "peerDependencies": { "typescript": "^5" } }, "sha512-F2Fw/icrT4vsKjNRcKtc5bUpHWAPyvObx3p84djPAZ/JTJNWJ0np9RmeUzorxiTHr1VdROTTsYke00lYb/0eKQ=="],
 
     "@humanfs/core": ["@humanfs/core@0.19.1", "", {}, "sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA=="],
 

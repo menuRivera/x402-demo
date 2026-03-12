@@ -31,8 +31,9 @@ export const verifySignature = async (
 
   const message = core.buildMessageToSign(
     evvmId,
-    hashPayload,
     signedAction.data.senderExecutor,
+    hashPayload,
+    signedAction.data.originExecutor,
     signedAction.data.nonce,
     signedAction.data.isAsyncExec,
   );
@@ -51,13 +52,13 @@ export const verifySignature = async (
   // verify nonces are ok
   if (signedAction.data.isAsyncExec) {
     // async execution, assert nonce hasn't been used before
-    const used = await core.isValidAsyncNonce(signedAction.data.nonce);
+    const used = await core.getIfUsedAsyncNonce(signedAction.data.nonce);
     if (used) {
       console.error("Invalid async nonce");
       return false;
     }
   } else {
-    const nextExpectedNonce = await core.getSyncNonce();
+    const nextExpectedNonce = await core.getNextCurrentSyncNonce();
     if (nextExpectedNonce.toString() != signedAction.data.nonce.toString()) {
       console.error("Invalid sync nonce");
       return false;

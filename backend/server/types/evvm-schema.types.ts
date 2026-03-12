@@ -1,7 +1,7 @@
 import { HexString } from "@evvm/evvm-js";
 import { PaymentRequirements } from "@x402/core/types";
 
-export interface IExactEvvmSchema extends PaymentRequirements {
+export interface IEvvmSchema extends PaymentRequirements {
   scheme: "evvm";
   network: `eip155:${number}`;
   amount: string;

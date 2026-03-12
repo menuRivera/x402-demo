@@ -1,6 +1,6 @@
 import type { HexString } from "@evvm/evvm-js";
 
-export interface IExactEvvmSchema {
+export interface IEvvmSchema {
   scheme: "evvm";
   network: `eip155:${number}`;
   amount: string;
