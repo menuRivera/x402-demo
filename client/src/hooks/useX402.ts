@@ -1,8 +1,8 @@
+import type { PaymentPayloadV2 } from "@x402/core/schemas";
+import type { IEvvmSchema } from "@evvm/x402";
 import { useCallback, useEffect, useState } from "react";
 import { useEVVM } from "./useEVVM";
-import type { IPaymentRequiredPayload } from "../types/payment-required-payload.types";
 import type { HexString } from "@evvm/evvm-js";
-import type { IPaymentPayload } from "../types/payment-payload.types";
 import { getRandomBigInt } from "../util/random";
 
 export type Status =
@@ -25,8 +25,7 @@ export interface PaymentDetails {
 export const useX402 = (url: string) => {
   const { core, signer, setCoreAddress } = useEVVM();
   const [signature, setSignature] = useState<string | null>(null);
-  const [paymentRequiredPayload, setPaymentRequiredPayload] =
-    useState<IPaymentRequiredPayload | null>(null);
+  const [offer, setOffer] = useState<IEvvmSchema | null>(null);
   const [status, setStatus] = useState<Status>("idle");
   const [content, setContent] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
@@ -44,7 +43,7 @@ export const useX402 = (url: string) => {
   useEffect(() => {
     // create payment signature when requirement and toolset defined
     signPayment();
-  }, [paymentRequiredPayload, core, signer]);
+  }, [offer, core, signer]);
 
   const fetchProtectedAsset = useCallback(async () => {
     const headers = new Headers();
@@ -77,10 +76,10 @@ export const useX402 = (url: string) => {
         try {
           // decode payment required header
           const paymentRequiredDecoded = atob(paymentRequiredHeader);
-          const _paymentPayload = JSON.parse(
-            paymentRequiredDecoded,
-          ) as IPaymentRequiredPayload;
-          setPaymentRequiredPayload(_paymentPayload);
+          const _paymentPayload = JSON.parse(paymentRequiredDecoded) as {
+            offers: [IEvvmSchema];
+          };
+          setOffer(_paymentPayload.offers[0]);
 
           const required = _paymentPayload.offers[0];
 
@@ -114,28 +113,26 @@ export const useX402 = (url: string) => {
 
   const signPayment = async () => {
     if (signature) return;
-    if (!paymentRequiredPayload || !core || !signer) {
+    if (!offer || !core || !signer) {
       return;
     }
 
     setStatus("signing");
 
     try {
-      const required = paymentRequiredPayload.offers[0];
-
       const paySignedAction = await core.pay({
-        toAddress: required.payTo as HexString,
-        amount: BigInt(required.amount),
-        tokenAddress: required.asset,
+        toAddress: offer.payTo as HexString,
+        amount: BigInt(offer.amount),
+        tokenAddress: offer.asset,
         nonce: getRandomBigInt(),
         priorityFee: 0n,
-        senderExecutor: required.extra.originExecutor,
+        senderExecutor: offer.extra.originExecutor,
         isAsyncExec: true,
       });
 
-      const paymentPayload: IPaymentPayload = {
+      const paymentPayload: PaymentPayloadV2 = {
         x402Version: 2,
-        accepted: required,
+        accepted: offer,
         payload: paySignedAction.toJSON(),
       };
 
@@ -153,7 +150,7 @@ export const useX402 = (url: string) => {
     setStatus("idle");
     setSignature(null);
     setPaymentDetails(null);
-    setPaymentRequiredPayload(null);
+    setOffer(null);
     setCoreAddress(null);
     setContent(null);
   };
