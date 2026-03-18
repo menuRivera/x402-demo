@@ -1,13 +1,21 @@
-// headers
-// PAYMENT-REQUIRED
-// PAYMENT-SIGNATURE
-// PAYMENT-RESPONSE
-
+import {
+  getSerializableSignedActionSchema,
+  PayDataSchema,
+} from "@evvm/evvm-js";
+import {
+  invalidPaymentResponse,
+  LocalFacilitator,
+  parseHeader,
+  paymentRequiredResponse,
+} from "@evvm/x402";
 import { SettleResponse } from "@x402/core/types";
 
 export default defineEventHandler(async (event) => {
+  const config = useRuntimeConfig();
   // include only /protected route
   const url = event.node.req.url;
+  const signer = await useSigner();
+  const facilitator = new LocalFacilitator(signer);
 
   const protectedRoute = url && url.startsWith("/protected");
 
@@ -17,21 +25,42 @@ export default defineEventHandler(async (event) => {
   if (method === "OPTIONS") return;
 
   // verify it has a valid payment attached
-  const paymentSignature = event.headers.get("PAYMENT-SIGNATURE");
-  if (!paymentSignature) return paymentRequiredResponse();
+  const paymentHeader = event.headers.get("PAYMENT-SIGNATURE");
+  if (!paymentHeader)
+    return paymentRequiredResponse([
+      {
+        scheme: "evvm",
+        network: "eip155:11155111", // sepolia
+        amount: "1000000000000000",
+        asset: "0x0000000000000000000000000000000000000001",
+        payTo: config.receiver,
+        maxTimeoutSeconds: 300,
+        extra: {
+          coreContractAddress: config.evvmCoreAddress,
+        },
+      },
+    ]);
 
-  const paymentPayload = await verifyPayment(paymentSignature);
-  if (!paymentPayload)
-    return invalidPaymentResponse("Couldn't verify signature");
+  const paymentPayload = parseHeader(paymentHeader);
 
-  const txHash = await settlePayment(paymentPayload);
+  if (!paymentPayload) return invalidPaymentResponse("Invalid payment header");
+
+  const { success, data: signedAction } = getSerializableSignedActionSchema(
+    PayDataSchema,
+  ).safeParse(paymentPayload.payload);
+  if (!success) return invalidPaymentResponse("Invalid signed action payload");
+
+  const valid = await facilitator.verifyPaySignature(signedAction);
+  if (!valid) return invalidPaymentResponse("Invalid signature");
+
+  const txHash = await facilitator.settlePayment(signedAction);
   if (!txHash) return invalidPaymentResponse("Settlement failed");
 
   const settleResponse: SettleResponse = {
     success: true,
-    payer: paymentPayload.payload.data.from,
+    payer: signedAction.data.from,
     transaction: txHash,
-    network: paymentPayload.accepted.network,
+    network: paymentPayload.accepted.network as `${string}:${string}`,
   };
 
   const jsonString = JSON.stringify(settleResponse);
