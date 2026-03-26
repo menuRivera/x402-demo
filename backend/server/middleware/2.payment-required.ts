@@ -27,6 +27,8 @@ export default defineEventHandler(async (event) => {
   // verify it has a valid payment attached
   const paymentHeader = event.headers.get("PAYMENT-SIGNATURE");
   if (!paymentHeader)
+    // this offer has been hardcoded for the demo, in production you may
+    // want to get this data from a database
     return paymentRequiredResponse([
       {
         scheme: "evvm",

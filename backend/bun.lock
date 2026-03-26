@@ -6,7 +6,7 @@
       "name": "nitro-app",
       "dependencies": {
         "@evvm/evvm-js": "^0.1.31",
-        "@evvm/x402": "^0.1.4",
+        "@evvm/x402": "^0.1.5",
         "@x402/core": "^2.4.0",
         "viem": "2.45.0",
       },
@@ -83,7 +83,7 @@
 
     "@evvm/evvm-js": ["@evvm/evvm-js@0.1.31", "", { "dependencies": { "crypto-browserify": "^3.12.1", "ethers": "^6.16.0", "viem": "2.45.0", "zod": "^4.3.6" }, "peerDependencies": { "typescript": "^5" } }, "sha512-ws7wO9mi+/Gexqqzmyjgy0S4TimB5vjjtT8j39MmJmWgqVBNUgWyUXF+AUI8cTiRGKiYSTtrgvrAN1EgLI39WQ=="],
 
-    "@evvm/x402": ["@evvm/x402@0.1.4", "", { "dependencies": { "@evvm/evvm-js": "^0.1.31", "@x402/core": "^2.6.0", "viem": "^2.47.2", "zod": "^4.3.6" }, "peerDependencies": { "next": ">=15" }, "optionalPeers": ["next"] }, "sha512-hF/FrkphypK+XYt3+SYACueMyGeccOM089UXWX80kmtbIjtlYu3UXhNOnV9m/FBglO8OwNXzcfg/djwcHK6ZbQ=="],
+    "@evvm/x402": ["@evvm/x402@0.1.5", "", { "dependencies": { "@evvm/evvm-js": "^0.1.31", "@x402/core": "^2.6.0", "viem": "^2.47.2", "zod": "^4.3.6" }, "peerDependencies": { "next": ">=15" }, "optionalPeers": ["next"] }, "sha512-S64PouvmD79nURbcNBIUQOvoCKE9gei+a6VwNyfe7r9O/XDV2MEbWaPypjLQo9vP14PHZ6BLgQpmX0CSTfpGgA=="],
 
     "@ioredis/commands": ["@ioredis/commands@1.5.0", "", {}, "sha512-eUgLqrMf8nJkZxT24JvVRrQya1vZkQh8BBeYNwGDqa5I0VUi8ACx7uFvAaLxintokpTenkK6DASvo/bvNbBGow=="],
 

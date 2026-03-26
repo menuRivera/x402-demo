@@ -83,8 +83,9 @@ export const useX402 = (url: string) => {
 
           const required = _paymentPayload.offers[0];
 
+          // it fails because the purpose of this frontend is meant to handle only evvm schemas,
+          // this is the where you would add multi schema support if you wanted to
           if (required.scheme !== "evvm") {
-            setStatus("error");
             setError(
               `Invalid scheme received. Expected 'evvm', received '${required.scheme}'`,
             );
@@ -93,7 +94,7 @@ export const useX402 = (url: string) => {
 
           setCoreAddress(required.extra.coreContractAddress);
           setPaymentDetails({
-            amount: (Number(required.amount) / 1e18).toFixed(1),
+            amount: required.amount,
             token: required.asset,
             recipient: `${required.payTo.slice(0, 6)}...${required.payTo.slice(-4)}`,
             network: required.network,
@@ -120,14 +121,29 @@ export const useX402 = (url: string) => {
     setStatus("signing");
 
     try {
+      console.log({
+        offer,
+      });
+
+      let nonce = 0n;
+      let usedNonce = true;
+      while (usedNonce) {
+        nonce = getRandomBigInt();
+        usedNonce = await core.getIfUsedAsyncNonce(nonce);
+      }
+
       const paySignedAction = await core.pay({
         toAddress: offer.payTo as HexString,
         amount: BigInt(offer.amount),
         tokenAddress: offer.asset,
-        nonce: getRandomBigInt(),
+        nonce: nonce,
         priorityFee: 0n,
-        senderExecutor: offer.extra.originExecutor,
+        originExecutor: offer.extra.originExecutor,
         isAsyncExec: true,
+      });
+
+      console.log({
+        paySignedAction,
       });
 
       const paymentPayload: PaymentPayloadV2 = {

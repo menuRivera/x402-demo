@@ -8,8 +8,16 @@ interface PaymentStepperProps {
 
 const steps = [
   { key: "fetching", label: "Fetch", description: "Requesting resource" },
-  { key: "authorize", label: "Authorize", description: "Signing payment transaction" },
-  { key: "fetching-with-signature", label: "Confirm", description: "Completing request with payment" },
+  {
+    key: "authorize",
+    label: "Authorize",
+    description: "Signing payment transaction",
+  },
+  {
+    key: "fetching-with-signature",
+    label: "Confirm",
+    description: "Completing request with payment",
+  },
   { key: "success", label: "Done", description: "Resource received" },
 ] as const;
 
@@ -37,7 +45,10 @@ function formatTimeout(seconds: number): string {
   return `${Math.floor(seconds / 86400)}d`;
 }
 
-export function PaymentStepper({ status, paymentDetails }: PaymentStepperProps) {
+export function PaymentStepper({
+  status,
+  paymentDetails,
+}: PaymentStepperProps) {
   const getStepIndex = (s: Status): number => {
     switch (s) {
       case "fetching":
@@ -58,7 +69,11 @@ export function PaymentStepper({ status, paymentDetails }: PaymentStepperProps) 
 
   const currentIndex = getStepIndex(status);
   const isError = status === "error";
-  const showPaymentDetails = (status === "payment-required" || status === "signing" || status === "fetching-with-signature") && paymentDetails;
+  const showPaymentDetails =
+    (status === "payment-required" ||
+      status === "signing" ||
+      status === "fetching-with-signature") &&
+    paymentDetails;
 
   if (status === "idle") return null;
 
@@ -66,7 +81,7 @@ export function PaymentStepper({ status, paymentDetails }: PaymentStepperProps) 
     <div className="flex flex-col items-center">
       <div className="flex items-center justify-center gap-0">
         {steps.map((step, index) => {
-          const isCompleted = index < currentIndex;
+          const isCompleted = index < currentIndex || currentIndex == 3; //success
           const isActive = index === currentIndex;
           const isPending = index > currentIndex;
 
@@ -121,11 +136,18 @@ export function PaymentStepper({ status, paymentDetails }: PaymentStepperProps) 
 
       {showPaymentDetails && (
         <div className="mt-4 bg-white border border-zinc-200 rounded-lg p-4 w-full max-w-sm shadow-sm">
+          <h3 className="mb-4 mt-2 text-center">402: Payment Required</h3>
           <div className="space-y-2 font-mono text-xs">
             <div className="flex justify-between items-center py-1 border-b border-zinc-100">
               <span className="text-zinc-500">Amount</span>
               <span className="text-zinc-800 font-medium">
-                {paymentDetails?.amount} {paymentDetails?.token}
+                {paymentDetails?.amount}
+              </span>
+            </div>
+            <div className="flex justify-between items-center py-1 border-b border-zinc-100">
+              <span className="text-zinc-500">Token</span>
+              <span className="text-zinc-800 font-medium">
+                {paymentDetails?.token}
               </span>
             </div>
             <div className="flex justify-between items-center py-1 border-b border-zinc-100">
@@ -134,11 +156,15 @@ export function PaymentStepper({ status, paymentDetails }: PaymentStepperProps) 
             </div>
             <div className="flex justify-between items-center py-1 border-b border-zinc-100">
               <span className="text-zinc-500">Network</span>
-              <span className="text-zinc-600">{formatNetwork(paymentDetails?.network || "")}</span>
+              <span className="text-zinc-600">
+                {formatNetwork(paymentDetails?.network || "")}
+              </span>
             </div>
             <div className="flex justify-between items-center py-1">
               <span className="text-zinc-500">Timeout</span>
-              <span className="text-zinc-600">{formatTimeout(paymentDetails?.maxTimeout || 0)}</span>
+              <span className="text-zinc-600">
+                {formatTimeout(paymentDetails?.maxTimeout || 0)}
+              </span>
             </div>
           </div>
         </div>
