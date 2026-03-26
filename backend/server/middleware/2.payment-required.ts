@@ -45,13 +45,22 @@ export default defineEventHandler(async (event) => {
 
   if (!paymentPayload) return invalidPaymentResponse("Invalid payment header");
 
-  const { success, data: signedAction } = getSerializableSignedActionSchema(
-    PayDataSchema,
-  ).safeParse(paymentPayload.payload);
-  if (!success) return invalidPaymentResponse("Invalid signed action payload");
+  const {
+    success,
+    data: signedAction,
+    error,
+  } = getSerializableSignedActionSchema(PayDataSchema).safeParse(
+    paymentPayload.payload,
+  );
 
-  const valid = await facilitator.verifyPaySignature(signedAction);
-  if (!valid) return invalidPaymentResponse("Invalid signature");
+  if (!success) {
+    console.error(error.message);
+    return invalidPaymentResponse("Invalid signed action payload");
+  }
+
+  const res = await facilitator.verifyPaySignature(signedAction);
+  if (!res.success)
+    return invalidPaymentResponse(res.error || "Invalid signature");
 
   const txHash = await facilitator.settlePayment(signedAction);
   if (!txHash) return invalidPaymentResponse("Settlement failed");
