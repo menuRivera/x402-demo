@@ -6,7 +6,7 @@
       "name": "client",
       "dependencies": {
         "@evvm/evvm-js": "0.1.26",
-        "@evvm/x402": "^0.1.5",
+        "@evvm/x402": "^0.1.6",
         "@rainbow-me/rainbowkit": "^2.2.10",
         "@tanstack/react-query": "^5.90.21",
         "@x402/core": "^2.7.0",
@@ -146,7 +146,7 @@
 
     "@evvm/evvm-js": ["@evvm/evvm-js@0.1.26", "", { "dependencies": { "crypto-browserify": "^3.12.1", "ethers": "^6.16.0", "viem": "2.45.0" }, "peerDependencies": { "typescript": "^5" } }, "sha512-F2Fw/icrT4vsKjNRcKtc5bUpHWAPyvObx3p84djPAZ/JTJNWJ0np9RmeUzorxiTHr1VdROTTsYke00lYb/0eKQ=="],
 
-    "@evvm/x402": ["@evvm/x402@0.1.5", "", { "dependencies": { "@evvm/evvm-js": "^0.1.31", "@x402/core": "^2.6.0", "viem": "^2.47.2", "zod": "^4.3.6" }, "peerDependencies": { "next": ">=15" }, "optionalPeers": ["next"] }, "sha512-S64PouvmD79nURbcNBIUQOvoCKE9gei+a6VwNyfe7r9O/XDV2MEbWaPypjLQo9vP14PHZ6BLgQpmX0CSTfpGgA=="],
+    "@evvm/x402": ["@evvm/x402@0.1.6", "", { "dependencies": { "@evvm/evvm-js": "^0.1.31", "@x402/core": "^2.6.0", "viem": "^2.47.2", "zod": "^4.3.6" }, "peerDependencies": { "next": ">=15" }, "optionalPeers": ["next"] }, "sha512-RvybudDP0gAf6GObMPBuDjjIITUmmQ/ECX9zpPWqISNCNoSSzmuqHfPWqnQG74qJ9ECHiyQdFnyu2dEaRYbOsA=="],
 
     "@humanfs/core": ["@humanfs/core@0.19.1", "", {}, "sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA=="],
 
